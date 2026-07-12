@@ -8,14 +8,23 @@ public class DotenvInitializer implements ApplicationContextInitializer<Configur
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        Dotenv dotenv = Dotenv.configure()
-                .directory("./")
-                .ignoreIfMissing()
-                .load();
+        try {
+            Dotenv dotenv = Dotenv.configure()
+                    .directory("./")
+                    .ignoreIfMissing()
+                    .load();
 
-        System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
-        System.setProperty("GOOGLE_CLIENT_SECRET", dotenv.get("GOOGLE_CLIENT_SECRET"));
-        System.setProperty("FACEBOOK_CLIENT_ID", dotenv.get("FACEBOOK_CLIENT_ID"));
-        System.setProperty("FACEBOOK_CLIENT_SECRET", dotenv.get("FACEBOOK_CLIENT_SECRET"));
+            setIfPresent("GOOGLE_CLIENT_ID", dotenv);
+            setIfPresent("GOOGLE_CLIENT_SECRET", dotenv);
+        } catch (Exception e) {
+            // Ignore: .env file not present (e.g. in production)
+        }
+    }
+
+    private void setIfPresent(String key, Dotenv dotenv) {
+        String value = dotenv.get(key);
+        if (value != null && !value.isEmpty()) {
+            System.setProperty(key, value);
+        }
     }
 }
