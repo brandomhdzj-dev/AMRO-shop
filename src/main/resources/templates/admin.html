@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AMRO Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 3px; }
+        .header-logo span { font-size: 11px; letter-spacing: 8px; display: block; color: #aaa; }
+        .header-actions { display: flex; gap: 10px; }
+        .btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-pedidos { background: #ffc107; color: #333; }
+        .btn-pedidos:hover { background: #e0a800; }
+        .btn-ventas { background: #28a745; color: white; }
+        .btn-ventas:hover { background: #218838; }
+        .btn-agregar { background: #007bff; color: white; }
+        .btn-agregar:hover { background: #0056b3; }
+        .btn-logo { background: #6f42c1; color: white; }
+        .btn-logo:hover { background: #5a32a3; }
+        .btn-logout { background: #dc3545; color: white; }
+        .btn-logout:hover { background: #a71d2a; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-icono { font-size: 30px; margin-bottom: 8px; }
+        .stat-numero { font-size: 28px; font-weight: bold; color: #111; }
+        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+        .tabla-container { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 14px 12px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:hover { background: #f8f9fa; }
+        .acciones a { margin-right: 6px; padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; }
+        .btn-editar { background: #ffc107; color: #333; }
+        .btn-eliminar { background: #dc3545; color: white; }
+        .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
+        .stock-ok { color: #28a745; font-weight: bold; }
+        .stock-bajo { color: #e67e00; font-weight: bold; }
+        .stock-agotado { color: #dc3545; font-weight: bold; }
+        .genero-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .genero-hombre { background: #e3f2fd; color: #1565c0; }
+        .genero-mujer { background: #fce4ec; color: #c62828; }
+        .genero-unisex { background: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">AMRO<span>Admin Panel</span></div>
+        <div class="header-actions">
+            <a th:href="@{/admin/pedidos}" class="btn btn-pedidos">Pedidos</a>
+            <a th:href="@{/admin/pedidos/vendidos}" class="btn btn-ventas">Ventas</a>
+            <a th:href="@{/admin/productos/nuevo}" class="btn btn-agregar">+ Producto</a>
+            <a th:href="@{/admin/carrusel}" class="btn" style="background:#9c27b0; color:white;">Carrusel</a>
+            <a th:href="@{/admin/logo}" class="btn btn-logo">Logo</a>
+            <a th:href="@{/admin/logout}" class="btn btn-logout">Salir</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-icono">&#128722;</div>
+                <div class="stat-numero" th:text="${#lists.size(productos)}">0</div>
+                <div class="stat-label">Productos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icono">&#128100;</div>
+                <div class="stat-numero">Admin</div>
+                <div class="stat-label">Sesión activa</div>
+            </div>
+        </div>
+
+        <div class="tabla-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Género</th>
+                        <th>Categoría</th>
+                        <th>Tallas</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="producto : ${productos}">
+                        <td>
+                            <img th:if="${producto.imagen != null}" th:src="@{'/imagenes/' + ${producto.imagen}}" class="thumb">
+                            <span th:if="${producto.imagen == null}">Sin foto</span>
+                        </td>
+                        <td th:text="${producto.nombre}"></td>
+                        <td>
+                            <span class="genero-badge genero-hombre" th:if="${producto.genero == 'Hombre'}" th:text="${producto.genero}"></span>
+                            <span class="genero-badge genero-mujer" th:if="${producto.genero == 'Mujer'}" th:text="${producto.genero}"></span>
+                            <span class="genero-badge genero-unisex" th:if="${producto.genero == 'Unisex'}" th:text="${producto.genero}"></span>
+                        </td>
+                        <td th:text="${producto.categoria}"></td>
+                        <td th:text="${producto.tallas}"></td>
+                        <td th:text="'$' + ${producto.precio}"></td>
+                        <td>
+                            <span th:if="${producto.stock > 5}" class="stock-ok" th:text="${producto.stock}"></span>
+                            <span th:if="${producto.stock > 0 and producto.stock <= 5}" class="stock-bajo" th:text="${producto.stock} + ' (bajo)'"></span>
+                            <span th:if="${producto.stock == 0}" class="stock-agotado">Agotado</span>
+                        </td>
+                        <td class="acciones">
+                            <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn-editar">Editar</a>
+                            <a th:href="@{/admin/productos/eliminar/{id}(id=${producto.id})}" class="btn-eliminar" onclick="return confirm('¿Eliminar este producto?')">Eliminar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

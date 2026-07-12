@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Exitosa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .exito { text-align: center; background: white; padding: 50px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        .exito-icono { font-size: 60px; margin-bottom: 20px; }
+        .exito-titulo { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+        .exito-texto { color: #666; margin-bottom: 30px; }
+        .exito-btn { display: inline-block; padding: 12px 30px; background: #111; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="exito">
+        <div class="exito-icono">&#10004;</div>
+        <h1 class="exito-titulo">¡Compra realizada!</h1>
+        <p class="exito-texto">Tu pedido ha sido recibido. Nos pondremos en contacto contigo pronto.</p>
+        <a th:href="@{/}" class="exito-btn">Volver al inicio</a>
+    </div>
+</body>
+</html>

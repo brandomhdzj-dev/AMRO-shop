@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .login-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.3); width: 350px; }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; font-size: 24px; }
+        .subtitle { text-align: center; color: #888; font-size: 12px; letter-spacing: 3px; margin-bottom: 25px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        .btn { display: block; width: 100%; padding: 12px; margin-top: 20px; background: #1a1a2e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn:hover { background: #16213e; }
+        .volver { text-align: center; margin-top: 20px; }
+        .volver a { color: #1a1a2e; text-decoration: none; }
+        .error { color: #c00; font-size: 13px; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>AMRO</h1>
+        <p class="subtitle">ADMIN</p>
+        <form th:action="@{/admin/verificar}" method="post">
+            <label>Contraseña</label>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit" class="btn">Entrar</button>
+        </form>
+        <div th:if="${param.error}" class="error">Contraseña incorrecta</div>
+        <div class="volver">
+            <a th:href="@{/}">← Volver</a>
+        </div>
+    </div>
+</body>
+</html>

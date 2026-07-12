@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Producto</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        h1 { text-align: center; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn { display: block; width: 100%; padding: 12px; margin-top: 20px; background: #1a1a2e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn:hover { background: #16213e; }
+        .preview { margin-top: 10px; text-align: center; }
+        .preview img { max-width: 200px; max-height: 200px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="${producto.id != null} ? 'Editar Producto' : 'Agregar Producto'"></h1>
+        <form th:action="@{/admin/productos/guardar}" th:object="${producto}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{id}">
+
+            <label>Nombre</label>
+            <input type="text" th:field="*{nombre}" required>
+
+            <label>Categoría</label>
+            <select th:field="*{categoria}" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="Camisas">Camisas</option>
+                <option value="Pantalones">Pantalones</option>
+                <option value="Faldas">Faldas</option>
+                <option value="Vestidos">Vestidos</option>
+                <option value="Chaquetas">Chaquetas</option>
+                <option value="Zapatos">Zapatos</option>
+                <option value="Accesorios">Accesorios</option>
+            </select>
+
+            <label>Género</label>
+            <select th:field="*{genero}" required>
+                <option value="">Selecciona el género</option>
+                <option value="Hombre">Hombre</option>
+                <option value="Mujer">Mujer</option>
+                <option value="Unisex">Unisex</option>
+            </select>
+
+            <label>Costo</label>
+            <input type="number" step="0.01" th:field="*{costo}" required>
+
+            <label>Precio de venta</label>
+            <input type="number" step="0.01" th:field="*{precio}" required>
+
+            <label>Stock (cantidad disponible)</label>
+            <input type="number" th:field="*{stock}" required>
+
+            <label>Tallas disponibles (selecciona varias)</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" name="tallasSeleccionadas" value="XS" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XS')}"> XS
+                </label>
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" name="tallasSeleccionadas" value="S" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('S')}"> S
+                </label>
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" name="tallasSeleccionadas" value="M" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('M')}"> M
+                </label>
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" name="tallasSeleccionadas" value="L" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('L')}"> L
+                </label>
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" name="tallasSeleccionadas" value="XL" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XL')}"> XL
+                </label>
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" name="tallasSeleccionadas" value="XXL" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XXL')}"> XXL
+                </label>
+            </div>
+
+            <label>Descripción del producto</label>
+            <textarea th:field="*{descripcion}" rows="4" placeholder="Describe el producto..." style="width:100%; padding:10px; margin-top:5px; border:1px solid #ddd; border-radius:5px; box-sizing:border-box; font-family:Arial;"></textarea>
+
+            <label>Imagen del producto</label>
+            <input type="file" name="archivoImagen" accept="image/*" onchange="previewImage(event)">
+
+            <div class="preview" th:if="${producto.imagen != null}">
+                <img th:src="@{'/imagenes/' + ${producto.imagen}}" alt="Vista previa">
+            </div>
+            <div class="preview" id="preview-container"></div>
+
+            <button type="submit" class="btn" th:text="${producto.id != null} ? 'Guardar Cambios' : 'Guardar Producto'"></button>
+        </form>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('preview-container');
+                output.innerHTML = '<img src="' + reader.result + '" alt="Vista previa">';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+</body>
+</html>

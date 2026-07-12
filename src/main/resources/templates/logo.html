@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Subir Logo - AMRO Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 3px; }
+        .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: #6c757d; color: white; }
+        .btn:hover { background: #5a6268; }
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #111; }
+        p { color: #666; margin-bottom: 25px; }
+        .logo-preview { text-align: center; margin-bottom: 25px; }
+        .logo-preview img { max-width: 300px; max-height: 200px; border-radius: 10px; border: 2px solid #eee; }
+        .logo-placeholder { width: 300px; height: 200px; margin: 0 auto; background: #f5f5f5; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 14px; border: 2px dashed #ddd; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        input[type="file"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: white; }
+        .btn-subir { display: block; width: 100%; padding: 14px; margin-top: 20px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .btn-subir:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">AMRO</div>
+        <a th:href="@{/admin/dashboard}" class="btn">Volver al panel</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Logo de la tienda</h1>
+            <p>Sube tu logo para que aparezca en la página de inicio</p>
+
+            <div class="logo-preview">
+                <div th:if="${logo != null}">
+                    <img th:src="@{'/imagenes/' + ${logo}}" alt="Logo actual">
+                </div>
+                <div th:if="${logo == null}" class="logo-placeholder">
+                    No hay logo subido
+                </div>
+            </div>
+
+            <form th:action="@{/admin/logo/subir}" method="post" enctype="multipart/form-data">
+                <label>Seleccionar nueva imagen</label>
+                <input type="file" name="archivoLogo" accept="image/*" required>
+                <button type="submit" class="btn-subir">Subir Logo</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

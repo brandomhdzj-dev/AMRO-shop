@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${producto.nombre}">Detalle - AMRO Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; }
+
+        /* HEADER */
+        .header { background: #111; color: white; padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: white; }
+        .header-nav { display: flex; gap: 30px; }
+        .header-nav a { color: #ccc; text-decoration: none; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .header-nav a:hover { color: white; }
+        .header-actions { display: flex; gap: 15px; }
+        .header-actions a { color: white; text-decoration: none; font-size: 18px; }
+
+        /* CONTENEDOR DETALLE */
+        .detalle-container { max-width: 1000px; margin: 40px auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.1); display: flex; }
+        .detalle-imagen { flex: 1; min-height: 500px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; }
+        .detalle-imagen img { width: 100%; height: 100%; object-fit: cover; }
+        .detalle-imagen-placeholder { color: #ccc; font-size: 18px; }
+        .detalle-info { flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+        .detalle-categoria { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+        .detalle-nombre { font-size: 32px; font-weight: bold; color: #111; margin-bottom: 15px; }
+        .detalle-precio { font-size: 28px; font-weight: bold; color: #111; margin-bottom: 20px; }
+        .detalle-separador { height: 1px; background: #eee; margin: 20px 0; }
+
+        /* TALLA */
+        .detalle-talla-label { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 10px; text-transform: uppercase; }
+        .talla-opciones { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .talla-opcion { padding: 10px 18px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 14px; border-radius: 4px; transition: all 0.2s; }
+        .talla-opcion:hover { border-color: #111; }
+        .talla-opcion input { display: none; }
+        .talla-opcion.seleccionada { background: #111; color: white; border-color: #111; }
+
+        /* BOTON AGREGAR */
+        .btn-agregar { display: block; width: 100%; padding: 15px; background: #111; color: white; border: none; border-radius: 4px; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; margin-top: 20px; transition: background 0.3s; }
+        .btn-agregar:hover { background: #333; }
+
+        /* DESCRIPCION */
+        .detalle-descripcion { margin-top: 20px; }
+        .detalle-descripcion-label { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 10px; text-transform: uppercase; }
+        .detalle-descripcion-texto { color: #555; line-height: 1.8; font-size: 15px; }
+
+        /* STOCK */
+        .detalle-stock { margin-top: 20px; }
+        .stock-disponible { color: #28a745; font-size: 14px; font-weight: bold; }
+        .stock-bajo { color: #e67e00; font-size: 14px; font-weight: bold; }
+        .stock-agotado { color: #dc3545; font-size: 14px; font-weight: bold; }
+
+        /* BOTON VOLVER */
+        .btn-volver { display: inline-block; margin-top: 30px; padding: 12px 30px; background: #111; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; transition: background 0.3s; }
+        .btn-volver:hover { background: #333; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .detalle-container { flex-direction: column; margin: 20px; }
+            .detalle-imagen { min-height: 300px; }
+            .detalle-info { padding: 25px; }
+            .header { padding: 15px 20px; }
+            .header-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a th:href="@{/}" class="header-logo">AMRO</a>
+        <div class="header-nav">
+            <a th:href="@{/tienda}">Tienda</a>
+            <a th:href="@{/tienda/genero/Hombre}">Hombre</a>
+            <a th:href="@{/tienda/genero/Mujer}">Mujer</a>
+        </div>
+        <div class="header-actions">
+            <a th:href="@{/carrito}" style="color:white; text-decoration:none;">&#128722; Carrito</a>
+            <span sec:authorize="isAuthenticated()" style="color:#aaa; font-size:13px; margin-right:15px;" sec:authentication="name">Usuario</span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#888; cursor:pointer; font-size:12px;">Salir</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="color:#888; font-size:12px;">Iniciar sesión</a>
+        </div>
+    </div>
+
+    <div class="detalle-container">
+        <div class="detalle-imagen">
+            <div th:if="${producto.imagen != null}">
+                <img th:src="@{'/imagenes/' + ${producto.imagen}}" alt="${producto.nombre}">
+            </div>
+            <div th:if="${producto.imagen == null}" class="detalle-imagen-placeholder">
+                Sin imagen
+            </div>
+        </div>
+        <div class="detalle-info">
+            <p class="detalle-categoria" th:text="${producto.categoria}"></p>
+            <h1 class="detalle-nombre" th:text="${producto.nombre}"></h1>
+            <p class="detalle-precio" th:text="'$' + ${producto.precio}"></p>
+
+            <div class="detalle-separador"></div>
+
+            <div class="detalle-talla-label">Selecciona tu talla</div>
+            <div class="talla-opciones" th:each="talla : ${producto.tallas.split(',')}">
+                <label class="talla-opcion" onclick="seleccionarTalla(this)">
+                    <input type="radio" name="tallaSeleccionada" th:value="${talla}" required>
+                    <span th:text="${talla}"></span>
+                </label>
+            </div>
+
+            <div class="detalle-descripcion">
+                <p class="detalle-descripcion-label">Descripción</p>
+                <p class="detalle-descripcion-texto" th:if="${producto.descripcion != null}" th:text="${producto.descripcion}"></p>
+                <p class="detalle-descripcion-texto" th:if="${producto.descripcion == null}" style="color:#999;">Sin descripción disponible</p>
+            </div>
+
+            <div class="detalle-stock">
+                <p class="detalle-descripcion-label">Disponibilidad</p>
+                <p class="stock-disponible" th:if="${producto.stock > 5}">En stock</p>
+                <p class="stock-bajo" th:if="${producto.stock > 0 and producto.stock <= 5}">¡Últimas unidades! (<span th:text="${producto.stock}"></span>)</p>
+                <p class="stock-agotado" th:if="${producto.stock == 0}">Agotado</p>
+            </div>
+
+            <form th:action="@{/carrito/agregar}" method="post">
+                <input type="hidden" name="productoId" th:value="${producto.id}">
+                <input type="hidden" name="talla" id="tallaInput" value="">
+                <button type="submit" class="btn-agregar" onclick="return validarTalla()">Agregar al Carrito</button>
+            </form>
+
+            <p style="color:#666; font-size:12px; margin-top:10px;">* Inicia sesión con Google para realizar tu compra</p>
+
+            <a th:href="@{/tienda}" class="btn-volver" style="margin-top: 15px; text-align: center;">← Volver a la tienda</a>
+        </div>
+    </div>
+
+    <footer style="background:#111; color:white; padding:40px 50px; text-align:center; margin-top:40px;">
+        <p style="font-size:24px; font-weight:bold; letter-spacing:3px; margin-bottom:5px;">AMRO</p>
+        <p style="font-size:11px; color:#666; letter-spacing:10px; text-transform:uppercase; margin-bottom:15px;">Shop</p>
+        <p style="color:#aaa; font-size:14px; margin-bottom:15px;">Contacto:</p>
+        <a href="https://wa.me/5212971059858" target="_blank" style="color:#25D366; text-decoration:none; margin:0 10px; font-size:14px;">&#128222; 297 105 9858</a>
+        <a href="https://wa.me/5212971060839" target="_blank" style="color:#25D366; text-decoration:none; margin:0 10px; font-size:14px;">&#128222; 297 106 0839</a>
+        <div style="margin-top:20px;">
+            <p style="color:#aaa; font-size:14px; margin-bottom:10px;">Aceptamos:</p>
+            <a href="https://www.paypal.com/paypalme/ellis_hernandez" target="_blank" style="display:inline-block; background:#0070BA; color:white; padding:10px 25px; border-radius:25px; text-decoration:none; font-weight:bold; font-size:14px;">PayPal</a>
+        </div>
+        <p style="color:#666; font-size:12px; margin-top:25px;">&copy; 2026 AMRO Shop. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        function seleccionarTalla(element) {
+            document.querySelectorAll('.talla-opcion').forEach(function(el) {
+                el.classList.remove('seleccionada');
+            });
+            element.classList.add('seleccionada');
+            document.getElementById('tallaInput').value = element.querySelector('input').value;
+        }
+
+        function validarTalla() {
+            var talla = document.getElementById('tallaInput').value;
+            if (!talla) {
+                alert('Por favor selecciona una talla');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

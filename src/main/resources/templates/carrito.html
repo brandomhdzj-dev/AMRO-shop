@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito - AMRO Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; }
+
+        .header { background: #111; color: white; padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: white; }
+        .header-nav a { color: #ccc; text-decoration: none; font-size: 14px; margin-left: 20px; }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .titulo { font-size: 28px; font-weight: bold; margin-bottom: 30px; }
+
+        .carrito-item { background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px; display: flex; gap: 20px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .carrito-img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; background: #ddd; }
+        .carrito-info { flex: 1; }
+        .carrito-nombre { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+        .carrito-talla { color: #888; font-size: 13px; }
+        .carrito-precio { font-size: 18px; font-weight: bold; margin-top: 5px; }
+        .carrito-cantidad { display: flex; align-items: center; gap: 10px; }
+        .carrito-cantidad a { display: inline-block; width: 30px; height: 30px; background: #f0f0f0; text-align: center; line-height: 30px; text-decoration: none; color: #333; border-radius: 4px; }
+        .carrito-cantidad span { font-size: 16px; font-weight: bold; min-width: 20px; text-align: center; }
+        .carrito-subtotal { font-size: 16px; font-weight: bold; min-width: 80px; text-align: right; }
+        .carrito-eliminar { color: #dc3545; text-decoration: none; font-size: 13px; }
+
+        .carrito-total { background: white; border-radius: 8px; padding: 25px; margin-top: 20px; text-align: right; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .total-label { font-size: 14px; color: #888; text-transform: uppercase; }
+        .total-precio { font-size: 32px; font-weight: bold; margin: 5px 0 20px; }
+
+        .btn-comprar { display: inline-block; padding: 15px 50px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; }
+        .btn-comprar:hover { background: #218838; }
+        .btn-seguir { display: inline-block; padding: 15px 30px; background: #111; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; text-transform: uppercase; margin-right: 10px; }
+
+        .carrito-vacio { text-align: center; padding: 60px; color: #999; }
+        .carrito-vacio h2 { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a th:href="@{/}" class="header-logo">AMRO</a>
+        <div>
+            <a th:href="@{/tienda}" style="color:#ccc; text-decoration:none; font-size:14px;">Seguir comprando</a>
+            <span sec:authorize="isAuthenticated()" style="color:#aaa; font-size:13px; margin-left:20px;" sec:authentication="name">Usuario</span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#888; cursor:pointer; font-size:12px;">Salir</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="color:#888; font-size:12px; margin-left:20px;">Iniciar sesión</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="titulo">Mi Carrito</h1>
+
+        <div th:if="${#lists.isEmpty(carrito)}" class="carrito-vacio">
+            <h2>Tu carrito esta vacio</h2>
+            <p>Agrega productos desde la tienda</p>
+            <a th:href="@{/tienda}" class="btn-seguir" style="margin-top: 20px;">Ir a la tienda</a>
+        </div>
+
+        <div th:each="item, stat : ${carrito}" class="carrito-item">
+            <div th:if="${item.imagen != null}">
+                <img th:src="@{'/imagenes/' + ${item.imagen}}" class="carrito-img">
+            </div>
+            <div th:if="${item.imagen == null}" class="carrito-img" style="display:flex; align-items:center; justify-content:center; color:#ccc; font-size:12px;">
+                Sin foto
+            </div>
+            <div class="carrito-info">
+                <p class="carrito-nombre" th:text="${item.nombre}"></p>
+                <p class="carrito-talla">Talla: <span th:text="${item.talla}"></span></p>
+                <p class="carrito-precio" th:text="'$' + ${item.precio}"></p>
+            </div>
+            <div class="carrito-cantidad">
+                <a th:href="@{/carrito/actualizar/{index}/{cantidad}(index=${stat.index}, cantidad=${item.cantidad - 1})}">-</a>
+                <span th:text="${item.cantidad}"></span>
+                <a th:href="@{/carrito/actualizar/{index}/{cantidad}(index=${stat.index}, cantidad=${item.cantidad + 1})}">+</a>
+            </div>
+            <div class="carrito-subtotal" th:text="'$' + ${item.subtotal}"></div>
+            <a th:href="@{/carrito/eliminar/{index}(index=${stat.index})}" class="carrito-eliminar">Eliminar</a>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(carrito)}" class="carrito-total">
+            <p class="total-label">Total</p>
+            <p class="total-precio" th:text="'$' + ${total}"></p>
+            <a th:href="@{/tienda}" class="btn-seguir">Seguir comprando</a>
+            <form th:action="@{/carrito/comprar}" method="post" style="display:inline;">
+                <button type="submit" class="btn-comprar">Comprar ahora</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

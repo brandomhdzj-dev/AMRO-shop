@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedidos Pendientes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        h1 { color: #333; }
+        .btn { padding: 10px 20px; background: #1a1a2e; color: white; text-decoration: none; border-radius: 5px; }
+        .btn:hover { background: #16213e; }
+        .btn-volver { background: #6c757d; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .pedido-card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .pedido-info h3 { margin: 0 0 5px; }
+        .pedido-info p { margin: 3px 0; color: #666; font-size: 14px; }
+        .pedido-acciones { display: flex; gap: 10px; }
+        .btn-vender { padding: 8px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 13px; }
+        .btn-cancelar { padding: 8px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 13px; }
+        .sin-pedidos { text-align: center; padding: 60px; color: #999; background: white; border-radius: 8px; }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .nav-tab { padding: 10px 20px; background: white; color: #333; text-decoration: none; border-radius: 5px; font-size: 14px; }
+        .nav-tab.activo { background: #1a1a2e; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pedidos Pendientes</h1>
+            <div>
+                <a th:href="@{/admin/dashboard}" class="btn btn-volver">Volver al panel</a>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <a th:href="@{/admin/pedidos}" class="nav-tab activo">Pendientes</a>
+            <a th:href="@{/admin/pedidos/vendidos}" class="nav-tab">Vendidos</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(pedidos)}" class="sin-pedidos">
+            <h2>No hay pedidos pendientes</h2>
+            <p>Los pedidos de los clientes aparecerán aquí</p>
+        </div>
+
+        <div th:each="pedido : ${pedidos}" class="pedido-card">
+            <div class="pedido-info">
+                <h3 th:text="${pedido.nombreProducto}"></h3>
+                <p>Talla: <span th:text="${pedido.talla}"></span> | Cantidad: <span th:text="${pedido.cantidad}"></span></p>
+                <p>Total: <strong th:text="'$' + ${pedido.total}"></strong> | Fecha: <span th:text="${pedido.fecha}"></span></p>
+            </div>
+            <div class="pedido-acciones">
+                <a th:href="@{/admin/pedidos/vender/{id}(id=${pedido.id})}" class="btn-vender">Vendido</a>
+                <a th:href="@{/admin/pedidos/cancelar/{id}(id=${pedido.id})}" class="btn-cancelar">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

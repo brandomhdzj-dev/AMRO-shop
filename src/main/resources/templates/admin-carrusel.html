@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrusel - AMRO Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 3px; }
+        .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-volver { background: #6c757d; color: white; }
+        .btn-volver:hover { background: #5a6268; }
+        .btn-nuevo { background: #28a745; color: white; }
+        .btn-nuevo:hover { background: #218838; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #111; }
+        p { color: #666; margin-bottom: 20px; }
+        .slide-item { display: flex; align-items: center; gap: 20px; padding: 20px; background: #f9f9f9; border-radius: 10px; margin-bottom: 15px; border: 2px solid #eee; transition: border-color 0.2s; }
+        .slide-item:hover { border-color: #ddd; }
+        .slide-preview { width: 160px; height: 90px; border-radius: 8px; overflow: hidden; background: #ddd; flex-shrink: 0; position: relative; }
+        .slide-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-preview .grad { width: 100%; height: 100%; position: absolute; }
+        .slide-info { flex: 1; }
+        .slide-numero { font-size: 14px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .slide-titulo { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px; }
+        .slide-sub { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .slide-badge { display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-right: 8px; }
+        .slide-estado { font-size: 12px; font-weight: bold; padding: 3px 10px; border-radius: 12px; }
+        .slide-estado.activo { background: #d4edda; color: #155724; }
+        .slide-estado.inactivo { background: #f8d7da; color: #721c24; }
+        .acciones { display: flex; gap: 8px; }
+        .acciones a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; }
+        .btn-editar { background: #ffc107; color: #333; }
+        .btn-editar:hover { background: #e0a800; }
+        .btn-eliminar { background: #dc3545; color: white; }
+        .btn-eliminar:hover { background: #a71d2a; }
+        .btn-toggle { background: #17a2b8; color: white; }
+        .btn-toggle:hover { background: #138496; }
+        .nota { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">AMRO<span style="font-size:11px;letter-spacing:8px;display:block;color:#aaa;">Admin Panel</span></div>
+        <div>
+            <a th:href="@{/admin/carrusel/nuevo}" class="btn btn-nuevo">+ Nuevo Slide</a>
+            <a th:href="@{/admin/dashboard}" class="btn btn-volver">Volver al panel</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Gestión del Carrusel</h1>
+            <p>Máximo 6 slides. Se muestran en el orden indicado.</p>
+
+            <div class="nota">
+                <strong>Tip:</strong> Los gradientes se definen con códigos hex (ej: <code>#1a1a2e</code>). El badge es opcional (ej: "HASTA 40% DESCUENTO"). La imagen es opcional - si no subes, se usa solo el gradiente.
+            </div>
+
+            <div th:each="slide : ${slides}" class="slide-item">
+                <div class="slide-preview">
+                    <div th:if="${slide.imagen != null}" class="grad" th:style="'background-image: url(/imagenes/carrusel/' + ${slide.imagen} + '); background-size: cover; background-position: center;'"></div>
+                    <div th:if="${slide.imagen == null}" class="grad" th:style="'background: linear-gradient(135deg, ' + ${slide.gradienteInicio} + ', ' + ${slide.gradienteFin} + ');'"></div>
+                </div>
+                <div class="slide-info">
+                    <div class="slide-numero">Slide <span th:text="${slide.orden}"></span> <span th:text="${slide.id}">#1</span></div>
+                    <div class="slide-titulo" th:text="${slide.titulo}">Título</div>
+                    <div class="slide-sub" th:text="${slide.subtitulo}">Subtítulo</div>
+                    <div>
+                        <span th:if="${slide.badgeTexto != null}" class="slide-badge" th:text="${slide.badgeTexto}" th:style="'background: ' + ${slide.badgeColor} + '; color: white;'"></span>
+                        <span class="slide-estado" th:classappend="${slide.activo} ? 'activo' : 'inactivo'" th:text="${slide.activo} ? 'Activo' : 'Inactivo'"></span>
+                    </div>
+                </div>
+                <div class="acciones">
+                    <a th:href="@{/admin/carrusel/editar/{id}(id=${slide.id})}" class="btn-editar">Editar</a>
+                    <a th:href="@{/admin/carrusel/toggle/{id}(id=${slide.id})}" class="btn-toggle" th:text="${slide.activo} ? 'Desactivar' : 'Activar'"></a>
+                    <a th:href="@{/admin/carrusel/eliminar/{id}(id=${slide.id})}" class="btn-eliminar" onclick="return confirm('¿Eliminar este slide?')">Eliminar</a>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(slides)}" style="text-align:center; padding:40px; color:#888;">
+                No hay slides aún. Crea el primero.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

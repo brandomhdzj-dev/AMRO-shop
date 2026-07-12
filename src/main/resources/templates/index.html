@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMRO Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f0f0; }
+
+        /* HEADER */
+        .header { background: #111; color: white; padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .header-logo { font-size: 24px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+        .header-nav { display: flex; gap: 30px; }
+        .header-nav a { color: #ccc; text-decoration: none; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .header-nav a:hover { color: white; }
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+        .header-actions a { color: white; text-decoration: none; font-size: 20px; }
+
+        /* BUSCADOR */
+        .buscador-container { background: #111; padding: 0 40px 20px; }
+        .buscador { display: flex; max-width: 500px; }
+        .buscador input { flex: 1; padding: 12px 20px; border: none; font-size: 14px; outline: none; }
+        .buscador button { padding: 12px 25px; background: #333; color: white; border: none; cursor: pointer; font-size: 14px; text-transform: uppercase; }
+        .buscador button:hover { background: #555; }
+
+        /* LAYOUT PRINCIPAL */
+        .layout { display: flex; max-width: 1400px; margin: 0 auto; padding: 30px 20px; gap: 30px; }
+
+        /* SIDEBAR */
+        .sidebar { width: 250px; flex-shrink: 0; }
+        .sidebar-filtro { background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+        .sidebar-filtro h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .talla-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .talla-btn { padding: 10px; border: 1px solid #ddd; background: white; cursor: pointer; text-align: center; font-size: 13px; text-decoration: none; color: #333; border-radius: 4px; }
+        .talla-btn:hover { border-color: #333; }
+        .talla-btn.activo { background: #111; color: white; border-color: #111; }
+        .filtro-link { display: block; padding: 8px 0; color: #555; text-decoration: none; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
+        .filtro-link:hover { color: #111; }
+        .filtro-link.activo { color: #111; font-weight: bold; }
+
+        /* CONTENIDO */
+        .contenido { flex: 1; }
+        .contenido-titulo { font-size: 28px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .contenido-subtitulo { color: #888; font-size: 14px; margin-bottom: 25px; }
+
+        /* BOTONES CATEGORIA */
+        .categorias-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+        .cat-btn { padding: 8px 20px; border: 1px solid #ddd; background: white; color: #333; text-decoration: none; font-size: 13px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .cat-btn:hover { border-color: #333; }
+        .cat-btn.activo { background: #111; color: white; border-color: #111; }
+
+        /* GRID PRODUCTOS */
+        .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .producto-card { background: white; border-radius: 8px; overflow: hidden; transition: transform 0.3s; }
+        .producto-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .producto-img-container { position: relative; width: 100%; padding-top: 120%; background: #f5f5f5; overflow: hidden; }
+        .producto-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .producto-img-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 14px; }
+        .producto-info { padding: 15px; }
+        .producto-talla-badge { display: inline-block; padding: 2px 8px; background: #f0f0f0; color: #555; font-size: 11px; border-radius: 3px; margin-bottom: 8px; text-transform: uppercase; }
+        .producto-nombre { font-size: 15px; font-weight: 600; color: #111; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .producto-categoria { color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; }
+        .producto-precio { font-size: 18px; color: #111; font-weight: bold; }
+        .producto-stock { font-size: 12px; margin-top: 5px; }
+        .stock-disponible { color: #28a745; }
+        .stock-bajo { color: #e67e00; }
+        .stock-agotado { color: #dc3545; font-weight: bold; }
+        .sin-productos { text-align: center; padding: 60px; color: #999; grid-column: 1 / -1; }
+
+        /* BOTON ADMIN */
+        .btn-admin { position: fixed; bottom: 20px; right: 20px; background: #111; color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-admin:hover { background: #333; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .header { padding: 15px 20px; }
+            .header-nav { display: none; }
+            .buscador-container { padding: 0 20px 15px; }
+            .contenido { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">AMRO</div>
+        <div class="header-nav">
+            <a th:href="@{/}">Inicio</a>
+            <a th:href="@{/tienda}">Tienda</a>
+            <a th:href="@{/tienda/genero/Hombre}">Hombre</a>
+            <a th:href="@{/tienda/genero/Mujer}">Mujer</a>
+        </div>
+        <div class="header-actions">
+            <a th:href="@{/carrito}" style="color:white; text-decoration:none;">&#128722; Carrito</a>
+            <span sec:authorize="isAuthenticated()" style="color:#aaa; font-size:13px; margin-right:15px;" sec:authentication="name">Usuario</span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#888; cursor:pointer; font-size:12px;">Salir</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="color:#888; font-size:12px;">Iniciar sesión</a>
+        </div>
+    </div>
+
+    <div class="buscador-container">
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>Buscar</button>
+        </div>
+    </div>
+
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-filtro">
+                <h3>Categoría</h3>
+                <a th:href="@{/tienda}" class="filtro-link" th:classappend="${categoriaActual == null} ? 'activo' : ''">Todos</a>
+                <a th:href="@{/tienda/categoria/Camisas}" class="filtro-link" th:classappend="${categoriaActual == 'Camisas'} ? 'activo' : ''">Camisas</a>
+                <a th:href="@{/tienda/categoria/Pantalones}" class="filtro-link" th:classappend="${categoriaActual == 'Pantalones'} ? 'activo' : ''">Pantalones</a>
+                <a th:href="@{/tienda/categoria/Faldas}" class="filtro-link" th:classappend="${categoriaActual == 'Faldas'} ? 'activo' : ''">Faldas</a>
+                <a th:href="@{/tienda/categoria/Vestidos}" class="filtro-link" th:classappend="${categoriaActual == 'Vestidos'} ? 'activo' : ''">Vestidos</a>
+                <a th:href="@{/tienda/categoria/Chaquetas}" class="filtro-link" th:classappend="${categoriaActual == 'Chaquetas'} ? 'activo' : ''">Chaquetas</a>
+                <a th:href="@{/tienda/categoria/Zapatos}" class="filtro-link" th:classappend="${categoriaActual == 'Zapatos'} ? 'activo' : ''">Zapatos</a>
+                <a th:href="@{/tienda/categoria/Accesorios}" class="filtro-link" th:classappend="${categoriaActual == 'Accesorios'} ? 'activo' : ''">Accesorios</a>
+            </div>
+        </div>
+
+        <div class="contenido">
+            <p class="contenido-subtitulo">Home / Products</p>
+            <h2 class="contenido-titulo">Productos</h2>
+
+            <div th:if="${#lists.isEmpty(productos)}" class="sin-productos">
+                <h2>No hay productos en esta categoría</h2>
+                <p>Pronto agregaremos nuevas prendas</p>
+            </div>
+
+            <div class="productos-grid">
+                <div th:each="producto : ${productos}" class="producto-card">
+                    <a th:href="@{/producto/{id}(id=${producto.id})}" style="text-decoration:none; color:inherit;">
+                        <div class="producto-img-container">
+                            <div th:if="${producto.imagen != null}">
+                                <img th:src="@{'/imagenes/' + ${producto.imagen}}" class="producto-img" alt="${producto.nombre}">
+                            </div>
+                            <div th:if="${producto.imagen == null}" class="producto-img-placeholder">
+                                Sin imagen
+                            </div>
+                        </div>
+                        <div class="producto-info">
+                            <span class="producto-talla-badge" th:text="${producto.tallas}"></span>
+                            <p class="producto-nombre" th:text="${producto.nombre}"></p>
+                            <p class="producto-categoria" th:text="${producto.categoria}"></p>
+                            <p class="producto-precio" th:text="'$' + ${producto.precio}"></p>
+                            <p class="producto-stock" th:if="${producto.stock > 5}">
+                                <span class="stock-disponible">Disponible</span>
+                            </p>
+                            <p class="producto-stock" th:if="${producto.stock > 0 and producto.stock <= 5}">
+                                <span class="stock-bajo">Ultimas unidades (</span><span th:text="${producto.stock}"></span><span class="stock-bajo">)</span>
+                            </p>
+                            <p class="producto-stock" th:if="${producto.stock == 0}">
+                                <span class="stock-agotado">Agotado</span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background:#111; color:white; padding:40px 50px; text-align:center; margin-top:40px;">
+        <p style="font-size:24px; font-weight:bold; letter-spacing:3px; margin-bottom:5px;">AMRO</p>
+        <p style="font-size:11px; color:#666; letter-spacing:10px; text-transform:uppercase; margin-bottom:15px;">Shop</p>
+        <p style="color:#aaa; font-size:14px; margin-bottom:15px;">Contacto:</p>
+        <a href="https://wa.me/5212971059858" target="_blank" style="color:#25D366; text-decoration:none; margin:0 10px; font-size:14px;">&#128222; 297 105 9858</a>
+        <a href="https://wa.me/5212971060839" target="_blank" style="color:#25D366; text-decoration:none; margin:0 10px; font-size:14px;">&#128222; 297 106 0839</a>
+        <div style="margin-top:20px;">
+            <p style="color:#aaa; font-size:14px; margin-bottom:10px;">Aceptamos:</p>
+            <a href="https://www.paypal.com/paypalme/ellis_hernandez" target="_blank" style="display:inline-block; background:#0070BA; color:white; padding:10px 25px; border-radius:25px; text-decoration:none; font-weight:bold; font-size:14px;">PayPal</a>
+        </div>
+        <p style="color:#666; font-size:12px; margin-top:25px;">&copy; 2026 AMRO Shop. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

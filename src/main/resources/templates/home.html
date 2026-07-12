@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMRO Shop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1e1e24; color: #e0e0e0; }
+
+.header-top { background: #1e1e24; border-bottom: 1px solid #2a2a32; padding: 10px 50px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #888; }
+.header { background: #1e1e24; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
+.header-logo { font-size: 32px; font-weight: bold; letter-spacing: 5px; text-transform: uppercase; color: #fff; text-decoration: none; }
+.header-search { flex: 1; max-width: 500px; margin: 0 40px; }
+.header-search input { width: 100%; padding: 12px 20px; border: 2px solid #3a3a42; border-radius: 25px; font-size: 14px; outline: none; background: #2d2d35; color: #e0e0e0; }
+.header-search input:focus { border-color: #555; }
+.header-search input::placeholder { color: #888; }
+.header-actions { display: flex; gap: 20px; align-items: center; }
+.header-actions a { color: #aaa; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+.header-actions a:hover { color: #fff; }
+.cart-count { background: #444; color: white; border-radius: 50%; padding: 2px 8px; font-size: 11px; }
+
+/* NAV CATEGORIES */
+.nav-categories { background: #1e1e24; border-bottom: 1px solid #2a2a32; padding: 0 50px; overflow-x: auto; }
+.nav-categories a { display: inline-block; padding: 12px 18px; color: #aaa; text-decoration: none; font-size: 13px; white-space: nowrap; transition: all 0.2s; }
+.nav-categories a:hover { color: #fff; border-bottom: 2px solid #fff; }
+
+/* CATEGORIES GRID - Estilo Shein */
+.categorias { padding: 30px 50px; background: #1e1e24; }
+.categorias-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+.categoria-item { text-align: center; text-decoration: none; color: #e0e0e0; transition: transform 0.2s; }
+.categoria-item:hover { transform: translateY(-3px); }
+.categoria-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; background: #2d2d35; border: 3px solid #3a3a42; transition: border-color 0.2s; }
+.categoria-item:hover .categoria-img { border-color: #fff; }
+.categoria-nombre { margin-top: 8px; font-size: 12px; font-weight: 500; }
+
+/* HERO CON CARRUSEL */
+.hero-section { padding: 20px 50px; max-width: 1400px; margin: 0 auto; background: #1e1e24; }
+.hero-layout { display: grid; grid-template-columns: 200px 1fr 200px; gap: 15px; min-height: 400px; }
+
+/* Paneles laterales */
+.side-panel { background: #25252c; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.side-panel-item { background: #2d2d35; border-radius: 8px; padding: 15px; text-align: center; text-decoration: none; color: #e0e0e0; flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; transition: all 0.2s; border: 1px solid #3a3a42; }
+.side-panel-item:hover { background: #333; color: white; border-color: #444; }
+
+/* Carrusel central */
+.carousel-container { position: relative; border-radius: 10px; overflow: hidden; background: #2d2d35; }
+.carousel { display: flex; transition: transform 0.5s ease; height: 100%; }
+.carousel-slide { min-width: 100%; height: 400px; position: relative; cursor: pointer; }
+.carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+.carousel-slide .slide-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 30px; color: white; }
+.carousel-slide .slide-info h3 { font-size: 24px; margin-bottom: 5px; }
+.carousel-slide .slide-info p { font-size: 14px; opacity: 0.9; }
+.carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #2d2d35; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 10; transition: all 0.2s; color: #e0e0e0; }
+.carousel-btn:hover { background: #111; color: white; }
+.carousel-btn.prev { left: 15px; }
+.carousel-btn.next { right: 15px; }
+.carousel-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+.carousel-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; }
+.carousel-dot.active { background: white; width: 25px; border-radius: 5px; }
+
+        /* BOTON EXPLORAR */
+.explorar-section { text-align: center; padding: 40px 50px; background: #1e1e24; }
+.btn-explorar { display: inline-block; padding: 15px 50px; background: #3a3a42; color: #e0e0e0; text-decoration: none; border-radius: 30px; font-size: 16px; font-weight: 500; letter-spacing: 1px; transition: all 0.3s; border: 1px solid #4a4a52; }
+.btn-explorar:hover { background: #444; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+
+        /* PRODUCTOS DESTACADOS */
+.destacados { padding: 40px 50px; background: #25252c; margin-top: 20px; }
+.destacados-titulo { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 30px; color: #e0e0e0; }
+.destacados-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+.producto-card { background: #2d2d35; border-radius: 8px; overflow: hidden; text-decoration: none; color: #e0e0e0; transition: transform 0.3s; border: 1px solid #3a3a42; }
+.producto-card:hover { transform: translateY(-5px); }
+.producto-img { width: 100%; height: 280px; object-fit: cover; background: #333; }
+.producto-info { padding: 12px; }
+.producto-nombre { font-size: 14px; font-weight: 500; margin-bottom: 5px; color: #e0e0e0; }
+.producto-precio { font-size: 18px; font-weight: bold; color: #fff; }
+
+        /* FOOTER */
+.footer { background: #15151a; color: #aaa; padding: 40px 50px; margin-top: 40px; border-top: 1px solid #2a2a32; }
+.footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; }
+.footer-col h4 { font-size: 14px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: #e0e0e0; }
+.footer-col a { display: block; color: #888; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+.footer-col a:hover { color: #fff; }
+.footer-bottom { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #2a2a32; }
+.footer-logo { font-size: 28px; font-weight: bold; letter-spacing: 5px; color: #e0e0e0; }
+.footer-paypal { display: inline-block; background: #0070BA; color: white; padding: 10px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+
+        @media (max-width: 900px) {
+            .hero-layout { grid-template-columns: 1fr; }
+            .side-panel { display: none; }
+            .header { padding: 15px 20px; }
+            .categorias { padding: 20px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-top">
+        <span>Envío gratis en compras mayores a $500</span>
+        <span>Devolución gratis</span>
+    </div>
+
+    <div class="header">
+        <a th:href="@{/}" class="header-logo">AMRO</a>
+        <div class="header-search">
+            <input type="text" placeholder="Buscar productos...">
+        </div>
+        <div class="header-actions">
+            <a th:href="@{/carrito}">&#128722; Carrito</a>
+            <span sec:authorize="isAuthenticated()" style="color:#aaa; font-size:13px; margin-right:15px;" sec:authentication="name">Usuario</span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#888; cursor:pointer; font-size:12px;">Salir</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="color:#888; font-size:12px;">Iniciar sesión</a>
+        </div>
+    </div>
+
+    <div class="nav-categories">
+        <a th:href="@{/tienda/genero/Hombre}">Hombre</a>
+        <a th:href="@{/tienda/genero/Mujer}">Mujer</a>
+        <a th:href="@{/tienda/categoria/Conjuntos}">Conjuntos</a>
+        <a th:href="@{/tienda/categoria/Pantalones}">Pantalones</a>
+        <a th:href="@{/tienda/categoria/Faldas}">Faldas</a>
+        <a th:href="@{/tienda/categoria/Vestidos}">Vestidos</a>
+        <a th:href="@{/tienda/categoria/Chaquetas}">Chaquetas</a>
+        <a th:href="@{/tienda/categoria/Flores}">Flores</a>
+        <a th:href="@{/tienda/categoria/Lentes}">Lentes</a>
+        <a th:href="@{/tienda/categoria/Ropa Interior}">Ropa Interior</a>
+        <a th:href="@{/tienda/categoria/Lenceria}">Lencería</a>
+        <a th:href="@{/tienda/categoria/Zapatos}">Zapatos</a>
+        <a th:href="@{/tienda/categoria/Accesorios y Joyeria}">Accesorios y Joyería</a>
+    </div>
+
+    <!-- CATEGORÍAS CIRCULARES -->
+    <div class="categorias">
+        <div class="categorias-grid">
+            <a th:href="@{/tienda/genero/Mujer}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128087;</div>
+                <span class="categoria-nombre">Mujer</span>
+            </a>
+            <a th:href="@{/tienda/genero/Hombre}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #e3f2fd, #90caf9); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128084;</div>
+                <span class="categoria-nombre">Hombre</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Conjuntos}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #fff3e0, #ffcc80); display:flex; align-items:center; justify-content:center; font-size:40px;">&#129489;</div>
+                <span class="categoria-nombre">Conjuntos</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Pantalones}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #e8f5e9, #a5d6a7); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128086;</div>
+                <span class="categoria-nombre">Pantalones</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Faldas}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #f3e5f5, #ce93d8); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128087;</div>
+                <span class="categoria-nombre">Faldas</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Zapatos}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #fff8e1, #ffe082); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128098;</div>
+                <span class="categoria-nombre">Zapatos</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Bolsas}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #e0f7fa, #80deea); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128092;</div>
+                <span class="categoria-nombre">Bolsas</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Flores}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #fce4ec, #f48fb1); display:flex; align-items:center; justify-content:center; font-size:40px;">&#127803;</div>
+                <span class="categoria-nombre">Flores</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Lentes}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #efebe9, #bcaaa4); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128083;</div>
+                <span class="categoria-nombre">Lentes</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Ropa Interior}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #fce4ec, #ef9a9a); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128085;</div>
+                <span class="categoria-nombre">Ropa Interior</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Lenceria}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #f3e5f5, #ba68c8); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128139;</div>
+                <span class="categoria-nombre">Lencería</span>
+            </a>
+            <a th:href="@{/tienda/categoria/Accesorios y Joyeria}" class="categoria-item">
+                <div class="categoria-img" style="background: linear-gradient(135deg, #fffde7, #fff176); display:flex; align-items:center; justify-content:center; font-size:40px;">&#128141;</div>
+                <span class="categoria-nombre">Accesorios y Joyería</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- HERO CON CARRUSEL -->
+    <div class="hero-section">
+        <div class="hero-layout">
+            <!-- Panel izquierdo -->
+            <div class="side-panel">
+                <a href="#" class="side-panel-item">Flores hechas a mano</a>
+                <a href="#" class="side-panel-item">Joyería en rebaja</a>
+                <a href="#" class="side-panel-item">Promociones</a>
+                <a href="#" class="side-panel-item">De temporada</a>
+            </div>
+
+            <!-- Carrusel central -->
+            <div class="carousel-container">
+                <div class="carousel" id="carousel">
+                    <div class="carousel-slide">
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display:flex; align-items:center; justify-content:center;">
+                            <div style="text-align:center; color:white; max-width:600px; padding:40px;">
+                                <h2 style="font-size:48px; font-weight:bold; margin-bottom:15px; text-shadow: 0 0 30px rgba(255,255,255,0.1);">Nueva Colección</h2>
+                                <p style="font-size:20px; color:#ccc; margin-bottom:30px;">Descubre lo último en moda</p>
+                                <a th:href="@{/tienda/categoria/Conjuntos}" style="display:inline-block; padding:16px 48px; border:2px solid white; color:white; text-decoration:none; font-size:16px; text-transform:uppercase; letter-spacing:2px; transition:all 0.3s;">Ver Colección</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #8e44ad 0%, #e91e63 100%); display:flex; align-items:center; justify-content:center;">
+                            <div style="text-align:center; color:white; max-width:600px; padding:40px;">
+                                <h2 style="font-size:48px; font-weight:bold; margin-bottom:15px;">Joyería en Descuento</h2>
+                                <p style="font-size:20px; color:#fce4ec; margin-bottom:30px;">Hasta 40% OFF en collares y anillos</p>
+                                <a th:href="@{/tienda/categoria/Accesorios y Joyeria}" style="display:inline-block; padding:16px 48px; background:white; color:#8e44ad; text-decoration:none; font-size:16px; font-weight:bold; text-transform:uppercase; letter-spacing:2px; border-radius:30px; transition:all 0.3s;">Comprar Ahora</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); display:flex; align-items:center; justify-content:center;">
+                            <div style="text-align:center; color:white; max-width:600px; padding:40px;">
+                                <h2 style="font-size:48px; font-weight:bold; margin-bottom:15px;">Ropa de Hombre</h2>
+                                <p style="font-size:20px; color:#d6eaf8; margin-bottom:30px;">Estilo y comodidad para cada día</p>
+                                <a th:href="@{/tienda/genero/Hombre}" style="display:inline-block; padding:16px 48px; border:2px solid white; color:white; text-decoration:none; font-size:16px; text-transform:uppercase; letter-spacing:2px; transition:all 0.3s;">Ver Catálogo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); display:flex; align-items:center; justify-content:center;">
+                            <div style="text-align:center; color:white; max-width:600px; padding:40px;">
+                                <h2 style="font-size:48px; font-weight:bold; margin-bottom:15px;">Envío Gratis</h2>
+                                <p style="font-size:20px; color:#fadbd8; margin-bottom:30px;">En compras mayores a $500</p>
+                                <a th:href="@{/tienda}" style="display:inline-block; padding:16px 48px; background:white; color:#e74c3c; text-decoration:none; font-size:16px; font-weight:bold; text-transform:uppercase; letter-spacing:2px; border-radius:30px; transition:all 0.3s;">Aprovechar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); display:flex; align-items:center; justify-content:center;">
+                            <div style="text-align:center; color:white; max-width:600px; padding:40px;">
+                                <h2 style="font-size:48px; font-weight:bold; margin-bottom:15px;">Flores Artesanales</h2>
+                                <p style="font-size:20px; color:#e8f8f5; margin-bottom:30px;">Hechas a mano con amor</p>
+                                <a th:href="@{/tienda/categoria/Flores}" style="display:inline-block; padding:16px 48px; border:2px solid white; color:white; text-decoration:none; font-size:16px; text-transform:uppercase; letter-spacing:2px; transition:all 0.3s;">Ver Flores</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); display:flex; align-items:center; justify-content:center;">
+                            <div style="text-align:center; color:white; max-width:600px; padding:40px;">
+                                <h2 style="font-size:48px; font-weight:bold; margin-bottom:15px;">Joyería Premium</h2>
+                                <p style="font-size:20px; color:#fff3e0; margin-bottom:30px;">Acabados de calidad superior</p>
+                                <a th:href="@{/tienda/categoria/Accesorios y Joyeria}" style="display:inline-block; padding:16px 48px; border:2px solid white; color:white; text-decoration:none; font-size:16px; text-transform:uppercase; letter-spacing:2px; transition:all 0.3s;">Explorar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-btn prev" onclick="moverCarrusel(-1)">&#10094;</button>
+                <button class="carousel-btn next" onclick="moverCarrusel(1)">&#10095;</button>
+                <div class="carousel-dots">
+                    <span class="carousel-dot active" onclick="irASlide(0)"></span>
+                    <span class="carousel-dot" onclick="irASlide(1)"></span>
+                    <span class="carousel-dot" onclick="irASlide(2)"></span>
+                    <span class="carousel-dot" onclick="irASlide(3)"></span>
+                    <span class="carousel-dot" onclick="irASlide(4)"></span>
+                    <span class="carousel-dot" onclick="irASlide(5)"></span>
+                </div>
+            </div>
+
+            <!-- Panel derecho -->
+            <div class="side-panel">
+                <a href="#" class="side-panel-item">Lo más nuevo</a>
+                <a href="#" class="side-panel-item">Super rebajas</a>
+                <a href="#" class="side-panel-item">Top ventas</a>
+                <a href="#" class="side-panel-item">Exclusivo online</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN EXPLORAR -->
+    <div class="explorar-section">
+        <a th:href="@{/tienda}" class="btn-explorar">Explorar todos los artículos</a>
+    </div>
+
+    <!-- PRODUCTOS DESTACADOS -->
+    <div class="destacados">
+        <h2 class="destacados-titulo">Productos Destacados</h2>
+        <div class="destacados-grid">
+            <div th:each="producto : ${productos}" class="producto-card">
+                <a th:href="@{/producto/{id}(id=${producto.id})}" style="text-decoration:none; color:inherit;">
+                    <div th:if="${producto.imagen != null}">
+                        <img th:src="@{'/imagenes/' + ${producto.imagen}}" class="producto-img" alt="${producto.nombre}">
+                    </div>
+                    <div th:if="${producto.imagen == null}" class="producto-img" style="display:flex; align-items:center; justify-content:center; color:#ccc;">
+                        Sin imagen
+                    </div>
+                    <div class="producto-info">
+                        <p class="producto-nombre" th:text="${producto.nombre}"></p>
+                        <p class="producto-precio" th:text="'$' + ${producto.precio}"></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <a href="https://wa.me/5212971059858" target="_blank">&#128222; 297 105 9858</a>
+                <a href="https://wa.me/5212971060839" target="_blank">&#128222; 297 106 0839</a>
+            </div>
+            <div class="footer-col">
+                <h4>Categorías</h4>
+                <a th:href="@{/tienda/genero/Hombre}">Hombre</a>
+                <a th:href="@{/tienda/genero/Mujer}">Mujer</a>
+                <a th:href="@{/tienda/categoria/Conjuntos}">Conjuntos</a>
+                <a th:href="@{/tienda/categoria/Flores}">Flores</a>
+            </div>
+            <div class="footer-col">
+                <h4>Más</h4>
+                <a th:href="@{/tienda/categoria/Lentes}">Lentes</a>
+                <a th:href="@{/tienda/categoria/Ropa Interior}">Ropa Interior</a>
+                <a th:href="@{/tienda/categoria/Lenceria}">Lencería</a>
+                <a th:href="@{/tienda/categoria/Accesorios y Joyeria}">Accesorios y Joyería</a>
+            </div>
+            <div class="footer-col">
+                <h4>Método de pago</h4>
+                <a href="https://www.paypal.com/paypalme/ellis_hernandez" target="_blank" class="footer-paypal">PayPal</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-logo">AMRO</p>
+            <p style="color:#666; font-size:12px; margin-top:10px;">&copy; 2026 AMRO Shop. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 6;
+        let autoSlide;
+
+        function moverCarrusel(direccion) {
+            currentSlide += direccion;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            actualizarCarrusel();
+            reiniciarAutoSlide();
+        }
+
+        function irASlide(index) {
+            currentSlide = index;
+            actualizarCarrusel();
+            reiniciarAutoSlide();
+        }
+
+        function actualizarCarrusel() {
+            document.getElementById('carousel').style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function iniciarAutoSlide() {
+            autoSlide = setInterval(() => moverCarrusel(1), 5000);
+        }
+
+        function reiniciarAutoSlide() {
+            clearInterval(autoSlide);
+            iniciarAutoSlide();
+        }
+
+        iniciarAutoSlide();
+    </script>
+</body>
+</html>
