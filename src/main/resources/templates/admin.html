@@ -36,6 +36,7 @@
         .acciones a { margin-right: 6px; padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 600; }
         .btn-editar { background: #ffc107; color: #333; }
         .btn-eliminar { background: #dc3545; color: white; }
+        .btn-vender { background: #28a745; color: white; }
         .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
         .stock-ok { color: #28a745; font-weight: bold; }
         .stock-bajo { color: #e67e00; font-weight: bold; }
@@ -108,6 +109,7 @@
                             <span th:if="${producto.stock == 0}" class="stock-agotado">Agotado</span>
                         </td>
                         <td class="acciones">
+                            <a th:href="@{/admin/productos/vender/{id}(id=${producto.id})}" class="btn-vender" onclick="return confirm('¿Marcar como vendido?')">Vendido</a>
                             <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn-editar">Editar</a>
                             <a th:href="@{/admin/productos/eliminar/{id}(id=${producto.id})}" class="btn-eliminar" onclick="return confirm('¿Eliminar este producto?')">Eliminar</a>
                         </td>
