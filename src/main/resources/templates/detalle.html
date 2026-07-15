@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,11 +75,7 @@
         </div>
         <div class="header-actions">
             <a th:href="@{/carrito}" style="color:white; text-decoration:none;">&#128722; Carrito</a>
-            <span sec:authorize="isAuthenticated()" style="color:#aaa; font-size:13px; margin-right:15px;" sec:authentication="name">Usuario</span>
-            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit" style="background:none; border:none; color:#888; cursor:pointer; font-size:12px;">Salir</button>
-            </form>
-            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="color:#888; font-size:12px;">Iniciar sesión</a>
+            <a href="/login" style="color:#888; font-size:12px;">Iniciar sesión</a>
         </div>
     </div>
 
