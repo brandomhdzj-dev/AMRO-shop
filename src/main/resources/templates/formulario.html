@@ -82,7 +82,7 @@
             <input type="file" name="archivoImagen" accept="image/*" onchange="previewImage(event)">
 
             <div class="preview" th:if="${producto.imagen != null}">
-                <img th:src="@{'/imagenes/' + ${producto.imagen}}" alt="Vista previa">
+                <img th:src="${producto.imagen}" alt="Vista previa">
             </div>
             <div class="preview" id="preview-container"></div>
 

@@ -288,7 +288,7 @@
             <div th:each="producto : ${productos}" class="producto-card">
                 <a th:href="@{/producto/{id}(id=${producto.id})}" style="text-decoration:none; color:inherit;">
                     <div th:if="${producto.imagen != null}">
-                        <img th:src="@{'/imagenes/' + ${producto.imagen}}" class="producto-img" alt="${producto.nombre}">
+                        <img th:src="${producto.imagen}" class="producto-img" alt="${producto.nombre}">
                     </div>
                     <div th:if="${producto.imagen == null}" class="producto-img" style="display:flex; align-items:center; justify-content:center; color:#ccc;">
                         Sin imagen

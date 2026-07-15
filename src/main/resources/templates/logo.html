@@ -36,7 +36,7 @@
 
             <div class="logo-preview">
                 <div th:if="${logo != null}">
-                    <img th:src="@{'/imagenes/' + ${logo}}" alt="Logo actual">
+                    <img th:src="${logo}" alt="Logo actual">
                 </div>
                 <div th:if="${logo == null}" class="logo-placeholder">
                     No hay logo subido

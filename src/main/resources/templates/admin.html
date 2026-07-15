@@ -89,7 +89,7 @@
                 <tbody>
                     <tr th:each="producto : ${productos}">
                         <td>
-                            <img th:if="${producto.imagen != null}" th:src="@{'/imagenes/' + ${producto.imagen}}" class="thumb">
+                            <img th:if="${producto.imagen != null}" th:src="${producto.imagen}" class="thumb">
                             <span th:if="${producto.imagen == null}">Sin foto</span>
                         </td>
                         <td th:text="${producto.nombre}"></td>

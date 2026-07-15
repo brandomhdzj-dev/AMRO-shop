@@ -61,7 +61,7 @@
 
             <div th:each="slide : ${slides}" class="slide-item">
                 <div class="slide-preview">
-                    <div th:if="${slide.imagen != null}" class="grad" th:style="'background-image: url(/imagenes/carrusel/' + ${slide.imagen} + '); background-size: cover; background-position: center;'"></div>
+                    <div th:if="${slide.imagen != null}" class="grad" th:style="'background-image: url(' + ${slide.imagen} + '); background-size: cover; background-position: center;'"></div>
                     <div th:if="${slide.imagen == null}" class="grad" th:style="'background: linear-gradient(135deg, ' + ${slide.gradienteInicio} + ', ' + ${slide.gradienteFin} + ');'"></div>
                 </div>
                 <div class="slide-info">

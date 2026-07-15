@@ -63,7 +63,7 @@
 
         <div th:each="item, stat : ${carrito}" class="carrito-item">
             <div th:if="${item.imagen != null}">
-                <img th:src="@{'/imagenes/' + ${item.imagen}}" class="carrito-img">
+                <img th:src="${item.imagen}" class="carrito-img">
             </div>
             <div th:if="${item.imagen == null}" class="carrito-img" style="display:flex; align-items:center; justify-content:center; color:#ccc; font-size:12px;">
                 Sin foto

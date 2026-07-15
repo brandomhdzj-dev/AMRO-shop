@@ -1,11 +1,11 @@
 package com.brandom.mipaginaweb.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,8 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.brandom.mipaginaweb.model.CarouselSlide;
 import com.brandom.mipaginaweb.model.Producto;
+import com.brandom.mipaginaweb.model.Settings;
 import com.brandom.mipaginaweb.repository.CarouselSlideRepository;
 import com.brandom.mipaginaweb.repository.ProductoRepository;
+import com.brandom.mipaginaweb.repository.SettingsRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -33,17 +37,20 @@ public class ProductoController {
     @Autowired
     private CarouselSlideRepository carouselSlideRepository;
 
+    @Autowired
+    private SettingsRepository settingsRepository;
+
+    @Autowired
+    private Cloudinary cloudinary;
+
     private static final String PASSWORD_ADMIN = "Angela1511";
-    private static final String CARPETA_IMAGENES = System.getProperty("user.dir") + "/src/main/resources/static/imagenes/";
-    private static final String CARPETA_CARRUSEL = System.getProperty("user.dir") + "/src/main/resources/static/imagenes/carrusel/";
 
     // =================== VISTA PUBLICA (CLIENTE) ===================
 
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("productos", productoRepository.findAll());
-        String logo = getLogoFilename();
-        model.addAttribute("logo", logo);
+        model.addAttribute("logo", getLogoUrl());
         return "home";
     }
 
@@ -132,16 +139,9 @@ public class ProductoController {
         }
 
         if (!archivo.isEmpty()) {
-            String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename();
-            try {
-                File carpeta = new File(CARPETA_IMAGENES);
-                if (!carpeta.exists()) {
-                    carpeta.mkdirs();
-                }
-                archivo.transferTo(new File(CARPETA_IMAGENES + nombreArchivo));
-                producto.setImagen(nombreArchivo);
-            } catch (IOException e) {
-                e.printStackTrace();
+            String url = subirACloudinary(archivo, "amro-shop/productos");
+            if (url != null) {
+                producto.setImagen(url);
             }
         }
 
@@ -171,10 +171,7 @@ public class ProductoController {
 
         Producto producto = productoRepository.findById(id).orElse(null);
         if (producto != null && producto.getImagen() != null) {
-            File archivo = new File(CARPETA_IMAGENES + producto.getImagen());
-            if (archivo.exists()) {
-                archivo.delete();
-            }
+            eliminarDeCloudinary(producto.getImagen());
         }
 
         productoRepository.deleteById(id);
@@ -194,8 +191,7 @@ public class ProductoController {
         if (session.getAttribute("admin") == null) {
             return "redirect:/admin";
         }
-        String logo = getLogoFilename();
-        model.addAttribute("logo", logo);
+        model.addAttribute("logo", getLogoUrl());
         return "logo";
     }
 
@@ -206,37 +202,23 @@ public class ProductoController {
         }
 
         if (!archivo.isEmpty()) {
-            String nombreArchivo = "logo_" + UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename();
-            try {
-                File carpeta = new File(CARPETA_IMAGENES);
-                if (!carpeta.exists()) {
-                    carpeta.mkdirs();
-                }
+            String url = subirACloudinary(archivo, "amro-shop/logo");
+            if (url != null) {
+                Settings logoSetting = settingsRepository.findById("logoUrl").orElse(new Settings("logoUrl", null));
+                String oldUrl = logoSetting.getValue();
+                logoSetting.setValue(url);
+                settingsRepository.save(logoSetting);
 
-                File[] archivosExistentes = carpeta.listFiles((dir, name) -> name.startsWith("logo_"));
-                if (archivosExistentes != null) {
-                    for (File f : archivosExistentes) {
-                        f.delete();
-                    }
+                if (oldUrl != null) {
+                    eliminarDeCloudinary(oldUrl);
                 }
-
-                archivo.transferTo(new File(CARPETA_IMAGENES + nombreArchivo));
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         return "redirect:/admin/logo";
     }
 
-    private String getLogoFilename() {
-        File carpeta = new File(CARPETA_IMAGENES);
-        if (carpeta.exists()) {
-            File[] archivos = carpeta.listFiles((dir, name) -> name.startsWith("logo_"));
-            if (archivos != null && archivos.length > 0) {
-                return archivos[0].getName();
-            }
-        }
-        return null;
+    private String getLogoUrl() {
+        return settingsRepository.findById("logoUrl").map(Settings::getValue).orElse(null);
     }
 
     // =================== CARRUSEL ADMIN ===================
@@ -268,16 +250,9 @@ public class ProductoController {
         }
 
         if (!archivo.isEmpty()) {
-            String nombreArchivo = "slide_" + UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename();
-            try {
-                File carpeta = new File(CARPETA_CARRUSEL);
-                if (!carpeta.exists()) {
-                    carpeta.mkdirs();
-                }
-                archivo.transferTo(new File(CARPETA_CARRUSEL + nombreArchivo));
-                slide.setImagen(nombreArchivo);
-            } catch (IOException e) {
-                e.printStackTrace();
+            String url = subirACloudinary(archivo, "amro-shop/carrusel");
+            if (url != null) {
+                slide.setImagen(url);
             }
         }
 
@@ -307,10 +282,7 @@ public class ProductoController {
         }
         CarouselSlide slide = carouselSlideRepository.findById(id).orElse(null);
         if (slide != null && slide.getImagen() != null) {
-            File archivo = new File(CARPETA_CARRUSEL + slide.getImagen());
-            if (archivo.exists()) {
-                archivo.delete();
-            }
+            eliminarDeCloudinary(slide.getImagen());
         }
         carouselSlideRepository.deleteById(id);
         return "redirect:/admin/carrusel";
@@ -327,5 +299,47 @@ public class ProductoController {
             carouselSlideRepository.save(slide);
         }
         return "redirect:/admin/carrusel";
+    }
+
+    // =================== HELPERS CLOUDINARY ===================
+
+    @SuppressWarnings("unchecked")
+    private String subirACloudinary(MultipartFile archivo, String carpeta) {
+        try {
+            Map<String, Object> result = cloudinary.uploader().upload(
+                archivo.getBytes(),
+                ObjectUtils.asMap("folder", carpeta, "resource_type", "image")
+            );
+            return (String) result.get("secure_url");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void eliminarDeCloudinary(String url) {
+        if (url == null || url.isEmpty()) return;
+        try {
+            String publicId = extraerPublicId(url);
+            if (publicId != null) {
+                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String extraerPublicId(String url) {
+        Pattern pattern = Pattern.compile("upload/v\\d+/(.+?)\\.(jpg|jpeg|png|gif|webp|svg|avif)");
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        Pattern pattern2 = Pattern.compile("upload/(.+?)\\.(jpg|jpeg|png|gif|webp|svg|avif)");
+        Matcher matcher2 = pattern2.matcher(url);
+        if (matcher2.find()) {
+            return matcher2.group(1);
+        }
+        return null;
     }
 }

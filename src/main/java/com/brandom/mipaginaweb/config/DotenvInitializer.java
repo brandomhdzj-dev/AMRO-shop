@@ -16,6 +16,9 @@ public class DotenvInitializer implements ApplicationContextInitializer<Configur
 
             setIfPresent("GOOGLE_CLIENT_ID", dotenv);
             setIfPresent("GOOGLE_CLIENT_SECRET", dotenv);
+            setIfPresent("CLOUDINARY_CLOUD_NAME", dotenv);
+            setIfPresent("CLOUDINARY_API_KEY", dotenv);
+            setIfPresent("CLOUDINARY_API_SECRET", dotenv);
         } catch (Exception e) {
             // Ignore: .env file not present (e.g. in production)
         }

@@ -86,7 +86,7 @@
     <div class="detalle-container">
         <div class="detalle-imagen">
             <div th:if="${producto.imagen != null}">
-                <img th:src="@{'/imagenes/' + ${producto.imagen}}" alt="${producto.nombre}">
+                <img th:src="${producto.imagen}" alt="${producto.nombre}">
             </div>
             <div th:if="${producto.imagen == null}" class="detalle-imagen-placeholder">
                 Sin imagen

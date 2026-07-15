@@ -138,7 +138,7 @@
                     <a th:href="@{/producto/{id}(id=${producto.id})}" style="text-decoration:none; color:inherit;">
                         <div class="producto-img-container">
                             <div th:if="${producto.imagen != null}">
-                                <img th:src="@{'/imagenes/' + ${producto.imagen}}" class="producto-img" alt="${producto.nombre}">
+                                <img th:src="${producto.imagen}" class="producto-img" alt="${producto.nombre}">
                             </div>
                             <div th:if="${producto.imagen == null}" class="producto-img-placeholder">
                                 Sin imagen
