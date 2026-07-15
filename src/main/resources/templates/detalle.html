@@ -95,12 +95,18 @@
 
             <div class="detalle-separador"></div>
 
-            <div class="detalle-talla-label">Selecciona tu talla</div>
-            <div class="talla-opciones" th:each="talla : ${producto.tallas != null ? producto.tallas.split(',') : T(java.util.Collections).emptyList()}">
-                <label class="talla-opcion" onclick="seleccionarTalla(this)">
-                    <input type="radio" name="tallaSeleccionada" th:value="${talla}" required>
-                    <span th:text="${talla}"></span>
-                </label>
+            <div th:if="${producto.tallas != null and !producto.tallas.isEmpty()}">
+                <div class="detalle-talla-label">Selecciona tu talla</div>
+                <div class="talla-opciones">
+                    <label class="talla-opcion" th:each="talla : ${#strings.listSplit(producto.tallas, ',')}" onclick="seleccionarTalla(this)">
+                        <input type="radio" name="tallaSeleccionada" th:value="${#strings.trim(talla)}" required>
+                        <span th:text="${#strings.trim(talla)}"></span>
+                    </label>
+                </div>
+            </div>
+            <div th:if="${producto.tallas == null or producto.tallas.isEmpty()}">
+                <div class="detalle-talla-label">Talla</div>
+                <p style="color:#888; font-size:15px;">Unitalla</p>
             </div>
 
             <div class="detalle-descripcion">
@@ -151,10 +157,14 @@
         }
 
         function validarTalla() {
-            var talla = document.getElementById('tallaInput').value;
-            if (!talla) {
+            var tallaInput = document.getElementById('tallaInput');
+            var hayTallas = document.querySelector('.talla-opcion');
+            if (hayTallas && !tallaInput.value) {
                 alert('Por favor selecciona una talla');
                 return false;
+            }
+            if (!hayTallas) {
+                tallaInput.value = 'Unitalla';
             }
             return true;
         }

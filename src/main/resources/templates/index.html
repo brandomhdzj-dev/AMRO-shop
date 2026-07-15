@@ -145,7 +145,7 @@
                             </div>
                         </div>
                         <div class="producto-info">
-                            <span class="producto-talla-badge" th:text="${producto.tallas}"></span>
+                            <span class="producto-talla-badge" th:text="${producto.tallas != null and !producto.tallas.isEmpty()} ? ${producto.tallas} : 'Unitalla'"></span>
                             <p class="producto-nombre" th:text="${producto.nombre}"></p>
                             <p class="producto-categoria" th:text="${producto.categoria}"></p>
                             <p class="producto-precio" th:text="'$' + ${producto.precio}"></p>

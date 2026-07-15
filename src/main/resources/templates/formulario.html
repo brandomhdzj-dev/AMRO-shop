@@ -53,27 +53,43 @@
             <label>Stock (cantidad disponible)</label>
             <input type="number" th:field="*{stock}" required>
 
-            <label>Tallas disponibles (selecciona varias)</label>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 8px;">
+                <input type="checkbox" id="unitallaCheck" onchange="toggleTallas()" th:checked="${tallasSeleccionadas == null or tallasSeleccionadas.isEmpty()}"> Unitalla (no requiere talla)
+            </label>
+
+            <label id="labelTallas">Tallas disponibles (selecciona varias)</label>
+            <div id="tallasContainer" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
                 <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" name="tallasSeleccionadas" value="XS" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XS')}"> XS
+                    <input type="checkbox" name="tallasSeleccionadas" value="XS" class="talla-cb" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XS')}"> XS
                 </label>
                 <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" name="tallasSeleccionadas" value="S" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('S')}"> S
+                    <input type="checkbox" name="tallasSeleccionadas" value="S" class="talla-cb" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('S')}"> S
                 </label>
                 <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" name="tallasSeleccionadas" value="M" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('M')}"> M
+                    <input type="checkbox" name="tallasSeleccionadas" value="M" class="talla-cb" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('M')}"> M
                 </label>
                 <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" name="tallasSeleccionadas" value="L" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('L')}"> L
+                    <input type="checkbox" name="tallasSeleccionadas" value="L" class="talla-cb" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('L')}"> L
                 </label>
                 <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" name="tallasSeleccionadas" value="XL" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XL')}"> XL
+                    <input type="checkbox" name="tallasSeleccionadas" value="XL" class="talla-cb" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XL')}"> XL
                 </label>
                 <label style="font-weight: normal; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" name="tallasSeleccionadas" value="XXL" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XXL')}"> XXL
+                    <input type="checkbox" name="tallasSeleccionadas" value="XXL" class="talla-cb" th:checked="${tallasSeleccionadas != null and tallasSeleccionadas.contains('XXL')}"> XXL
                 </label>
             </div>
+
+            <script>
+                function toggleTallas() {
+                    var isUnitalla = document.getElementById('unitallaCheck').checked;
+                    document.getElementById('tallasContainer').style.display = isUnitalla ? 'none' : 'flex';
+                    document.getElementById('labelTallas').style.display = isUnitalla ? 'none' : 'block';
+                    if (isUnitalla) {
+                        document.querySelectorAll('.talla-cb').forEach(function(cb) { cb.checked = false; });
+                    }
+                }
+                window.onload = function() { toggleTallas(); };
+            </script>
 
             <label>Descripción del producto</label>
             <textarea th:field="*{descripcion}" rows="4" placeholder="Describe el producto..." style="width:100%; padding:10px; margin-top:5px; border:1px solid #ddd; border-radius:5px; box-sizing:border-box; font-family:Arial;"></textarea>
