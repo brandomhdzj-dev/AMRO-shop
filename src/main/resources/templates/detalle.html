@@ -100,7 +100,7 @@
             <div class="detalle-separador"></div>
 
             <div class="detalle-talla-label">Selecciona tu talla</div>
-            <div class="talla-opciones" th:each="talla : ${producto.tallas.split(',')}">
+            <div class="talla-opciones" th:each="talla : ${producto.tallas != null ? producto.tallas.split(',') : T(java.util.Collections).emptyList()}">
                 <label class="talla-opcion" onclick="seleccionarTalla(this)">
                     <input type="radio" name="tallaSeleccionada" th:value="${talla}" required>
                     <span th:text="${talla}"></span>
