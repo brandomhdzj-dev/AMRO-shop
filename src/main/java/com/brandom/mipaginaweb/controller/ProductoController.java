@@ -50,7 +50,6 @@ public class ProductoController {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("productos", productoRepository.findAll());
-        model.addAttribute("logo", getLogoUrl());
         return "home";
     }
 
